@@ -31,8 +31,8 @@ function HoneywellWifi(log, config, api) {
   this.accessories = [];
   this.hap_accessories = {};
 
-  this.log.debug("storagePath = %s", storagePath);
-  this.log.debug("config = %s", JSON.stringify(config));
+  this.log("storagePath = %s", storagePath);
+  this.log("config = %s", JSON.stringify(config));
 
   if (typeof(config) !== "undefined" && config !== null) {
     this.url = config.url;
@@ -46,7 +46,7 @@ function HoneywellWifi(log, config, api) {
   this.log("%s v%s", plugin_name, plugin_version);
 
   this.requestServer = http.createServer(function(request, response) {
-    if (request.url === "/add") {
+    if (request.url == "/add") {
       this.addAccessory(new Date().toISOString());
       response.writeHead(204);
       response.end();
@@ -99,10 +99,9 @@ HoneywellWifi.prototype.configureAccessory = function(accessory) {
     callback();
   });
 
-  if (accessory.getService(Service.Lightbulb)) {
-    accessory.getService(Service.Lightbulb)
-    .getCharacteristic(Characteristic.On)
-    .on('set', function(value, callback) {
+  service = accessory.getService(Service.Lightbulb);
+  if (service) {
+    service.getCharacteristic(Characteristic.On).on('set', function(value, callback) {
       platform.log(accessory.displayName, "Light -> " + value);
       callback();
     });
