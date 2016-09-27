@@ -195,13 +195,11 @@ HoneywellWifi.prototype.configurationRequestHandler = function(context, request,
 HoneywellWifi.prototype.addAccessory = function(accessoryName) {
   this.log("Add Accessory");
   var platform = this;
-  var uuid;
-
-  uuid = UUIDGen.generate(accessoryName);
+  var uuid = UUIDGen.generate(accessoryName);
 
   var newAccessory = new Accessory(accessoryName, uuid);
   newAccessory.on('identify', function(paired, callback) {
-    platform.log(accessory.displayName, "Identify!!!");
+    platform.log(newAccessory.displayName, "Identify!!!");
     callback();
   });
 
@@ -212,7 +210,7 @@ HoneywellWifi.prototype.addAccessory = function(accessoryName) {
   newAccessory.addService(Service.Lightbulb, "Test Light")
   .getCharacteristic(Characteristic.On)
   .on('set', function(value, callback) {
-    platform.log(accessory.displayName, "Light -> " + value);
+    platform.log(newAccessory.displayName, "Light -> " + value);
     callback();
   });
 
