@@ -1,6 +1,8 @@
 var http = require('http');
 var Accessory, Service, Characteristic, UUIDGen;
 
+var Utils = require('./lib/utils.js').Utils;
+
 var platform_name = "honeywell-wifi";
 var plugin_name = "homebridge-" + platform_name;
 var storagePath;
