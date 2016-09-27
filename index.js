@@ -99,10 +99,10 @@ HoneywellWifi.prototype.configureAccessory = function(accessory) {
     callback();
   });
 
-  service = accessory.getService(Service.Lightbulb);
+  service = accessory.getService(Service.Thermostat);
   if (service) {
-    service.getCharacteristic(Characteristic.On).on('set', function(value, callback) {
-      platform.log(accessory.displayName, "Light -> " + value);
+    service.getCharacteristic(Characteristic.TargetTemperature).on('set', function(value, callback) {
+      platform.log(accessory.displayName, "TargetTemperature -> " + value);
       callback();
     });
   }
@@ -206,12 +206,55 @@ HoneywellWifi.prototype.addAccessory = function(accessoryName) {
   // To help restore accessory in configureAccessory()
   // newAccessory.context.something = "Something"
 
-  newAccessory.addService(Service.Lightbulb, "Test Light")
-  .getCharacteristic(Characteristic.On)
-  .on('set', function(value, callback) {
-    platform.log(newAccessory.displayName, "Light -> " + value);
-    callback();
-  });
+  var service = newAccessory.addService(Service.Thermostat, "Test Thermo");
+
+  service.setCharacteristic(Characteristic.CurrentHeatingCoolingState,
+      Characteristic.CurrentHeatingCoolingState.COOL);
+
+  service.setCharacteristic(Characteristic.TargetHeatingCoolingState,
+      Characteristic.TargetHeatingCoolingState.COOL);
+
+  service.setCharacteristic(Characteristic.CurrentTemperature,
+      23);
+
+  service.setCharacteristic(Characteristic.TargetTemperature,
+      22);
+
+  service.setCharacteristic(Characteristic.CurrentHeatingCoolingState,
+      Characteristic.CurrentHeatingCoolingState.COOL);
+
+  service.setCharacteristic(Characteristic.TemperatureDisplayUnits,
+      Characteristic.TemperatureDisplayUnits.FAHRENHEIT);
+
+  service.getCharacteristic(Characteristic.CurrentHeatingCoolingState)
+      .on('set', function(value, callback) {
+        platform.log(newAccessory.displayName, "CurrentHeatingCoolingState -> " + value);
+        callback();
+      });
+
+  service.getCharacteristic(Characteristic.TargetHeatingCoolingState)
+      .on('set', function(value, callback) {
+        platform.log(newAccessory.displayName, "TargetHeatingCoolingState) -> " + value);
+        callback();
+      });
+
+  service.getCharacteristic(Characteristic.CurrentTemperature)
+      .on('set', function(value, callback) {
+        platform.log(newAccessory.displayName, "CurrentTemperature -> " + value);
+        callback();
+      });
+
+  service.getCharacteristic(Characteristic.TargetTemperature)
+      .on('set', function(value, callback) {
+        platform.log(newAccessory.displayName, "TargetTemperature -> " + value);
+        callback();
+      });
+
+  service.getCharacteristic(Characteristic.TemperatureDisplayUnits)
+      .on('set', function(value, callback) {
+        platform.log(newAccessory.displayName, "TemperatureDisplayUnits -> " + value);
+        callback();
+      });
 
   this.accessories.push(newAccessory);
   this.api.registerPlatformAccessories(plugin_name, platform_name, [newAccessory]);
