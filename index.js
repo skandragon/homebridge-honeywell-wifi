@@ -1,21 +1,22 @@
 var http = require('http');
 var Accessory, Service, Characteristic, UUIDGen;
 
+var platform_name = "honeywell-wifi";
+var plugin_name = "homebridge-" + platform_name;
+var storagePath;
+
 module.exports = function(homebridge) {
   console.log("homebridge API version: " + homebridge.version);
 
-  // Accessory must be created from PlatformAccessory Constructor
   Accessory = homebridge.platformAccessory;
-
-  // Service and Characteristic are from hap-nodejs
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
   UUIDGen = homebridge.hap.uuid;
 
-  // For platform plugin to be considered as dynamic platform plugin,
-  // registerPlatform(pluginName, platformName, constructor, dynamic), dynamic must be true
-  homebridge.registerPlatform("homebridge-honeywell-wifi", "honeywell-wifi", HoneywellWifi, true);
-}
+  storagePath = homebridge.user.storagePath();
+
+  homebridge.registerPlatform(plugin_name, platform_name, HoneywellWifi, true);
+};
 
 // Platform constructor
 // config may be null
@@ -26,6 +27,21 @@ function HoneywellWifi(log, config, api) {
   this.log = log;
   this.config = config;
   this.accessories = [];
+  this.hap_accessories = {};
+
+  this.log.debug("storagePath = %s", storagePath);
+  this.log.debug("config = %s", JSON.stringify(config));
+
+  if (typeof(config) !== "undefined" && config !== null) {
+    this.url = config.url;
+  } else {
+    this.log.error("config undefined or null!");
+    this.log("storagePath = %s", storagePath);
+    process.exit(1);
+  }
+
+  var plugin_version = Utils.readPluginVersion();
+  this.log("%s v%s", plugin_name, plugin_version);
 
   this.requestServer = http.createServer(function(request, response) {
     if (request.url === "/add") {
@@ -91,7 +107,7 @@ HoneywellWifi.prototype.configureAccessory = function(accessory) {
   }
 
   this.accessories.push(accessory);
-}
+};
 
 //Handler will be invoked when user try to config your plugin
 //Callback can be cached and invoke when nessary
@@ -108,7 +124,7 @@ HoneywellWifi.prototype.configurationRequestHandler = function(context, request,
     // set "type" to platform if the plugin is trying to modify platforms section
     // set "replace" to true will let homebridge replace existing config in config.json
     // "config" is the data platform trying to save
-    callback(null, "platform", true, {"platform":"HoneywellWifi", "otherConfig":"SomeData"});
+    callback(null, "platform", true, {"platform":platform_name, "otherConfig":"SomeData"});
     return;
   }
 
@@ -133,7 +149,7 @@ HoneywellWifi.prototype.configurationRequestHandler = function(context, request,
       //   "secure": true
       // }
     ]
-  }
+  };
 
   // - UI Type: List
   // Can be used to ask user to select something from the list
@@ -171,7 +187,7 @@ HoneywellWifi.prototype.configurationRequestHandler = function(context, request,
 
   //invoke callback to update setup UI
   callback(respDict);
-}
+};
 
 // Sample function to show how developer can add accessory dynamically from outside event
 HoneywellWifi.prototype.addAccessory = function(accessoryName) {
@@ -198,8 +214,8 @@ HoneywellWifi.prototype.addAccessory = function(accessoryName) {
   });
 
   this.accessories.push(newAccessory);
-  this.api.registerPlatformAccessories("homebridge-samplePlatform", "HoneywellWifi", [newAccessory]);
-}
+  this.api.registerPlatformAccessories(plugin_name, platform_name, [newAccessory]);
+};
 
 HoneywellWifi.prototype.updateAccessoriesReachability = function() {
   this.log("Update Reachability");
@@ -207,12 +223,12 @@ HoneywellWifi.prototype.updateAccessoriesReachability = function() {
     var accessory = this.accessories[index];
     accessory.updateReachability(false);
   }
-}
+};
 
 // Sample function to show how developer can remove accessory dynamically from outside event
 HoneywellWifi.prototype.removeAccessory = function() {
   this.log("Remove Accessory");
-  this.api.unregisterPlatformAccessories("homebridge-samplePlatform", "HoneywellWifi", this.accessories);
+  this.api.unregisterPlatformAccessories(plugin_name, platform_name, this.accessories);
 
   this.accessories = [];
-}
+};
