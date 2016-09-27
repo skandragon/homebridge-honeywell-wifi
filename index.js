@@ -203,7 +203,7 @@ HoneywellWifi.prototype.addAccessory = function(accessoryName) {
   newAccessory.on('identify', function(paired, callback) {
     platform.log(accessory.displayName, "Identify!!!");
     callback();
-  }).bind(this);
+  });
 
   // Plugin can save context on accessory
   // To help restore accessory in configureAccessory()
@@ -214,7 +214,7 @@ HoneywellWifi.prototype.addAccessory = function(accessoryName) {
   .on('set', function(value, callback) {
     platform.log(accessory.displayName, "Light -> " + value);
     callback();
-  }).bind(this);
+  });
 
   this.accessories.push(newAccessory);
   this.api.registerPlatformAccessories(plugin_name, platform_name, [newAccessory]);
